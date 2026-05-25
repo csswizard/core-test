@@ -16,3 +16,21 @@ steps:
 
 - script: dotnet build --no-restore --configuration Release
   displayName: 'Build'
+
+- script: dotnet publish --no-build --configuration Release --output $(Build.ArtifactStagingDirectory)/publish
+  displayName: 'Publish'
+
+- task: ArchiveFiles@2
+  displayName: 'Zip published output'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    ArtifactName: drop
