@@ -1,5 +1,6 @@
 trigger:
 - main
+- develop
 
 stages:
 - stage: Build
@@ -42,7 +43,7 @@ stages:
 - stage: Deploy_Dev
   displayName: 'Deploy to Dev'
   dependsOn: Build
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   jobs:
   - deployment: DeployWebAppDev
     displayName: 'Deploy Azure App Service (Dev)'
@@ -63,8 +64,8 @@ stages:
 
 - stage: Deploy
   displayName: 'Deploy to Azure'
-  dependsOn: Deploy_Dev
-  condition: succeeded()
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
   - deployment: DeployWebApp
     displayName: 'Deploy Azure App Service'
